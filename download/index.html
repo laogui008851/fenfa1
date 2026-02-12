@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>下载云际会议</title>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    /* 顶部横幅 */
+    .hero {
+      text-align: center;
+      padding: 20px 20px 20px;
+      color: #fff;
+    }
+    .hero .logo {
+      width: 160px; height: auto;
+      border-radius: 20px;
+      object-fit: contain;
+    }
+    .hero p { font-size: 18px; opacity: 0.9; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+
+    /* 下载卡片区域 */
+    .download-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+    .section-title {
+      text-align: center;
+      color: rgba(255,255,255,0.9);
+      font-size: 16px;
+      margin-bottom: 30px;
+      letter-spacing: 2px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 36px 24px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .card .icon {
+      width: 64px; height: 64px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card .icon svg { width: 56px; height: 56px; }
+    .card h3 { font-size: 20px; margin-bottom: 8px; color: #222; }
+    .card .desc { font-size: 13px; color: #999; margin-bottom: 20px; }
+    .card .btn {
+      display: inline-block;
+      padding: 10px 32px;
+      background: linear-gradient(135deg, #1e88e5, #1565c0);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: opacity 0.3s, transform 0.2s;
+    }
+    .card .btn:hover { opacity: 0.85; transform: scale(1.05); }
+    .card .btn-secondary {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 20px;
+      background: transparent;
+      color: #1565c0;
+      text-decoration: none;
+      border: 1.5px solid #1565c0;
+      border-radius: 30px;
+      font-size: 12px;
+      transition: background 0.3s, color 0.3s;
+    }
+    .card .btn-secondary:hover { background: #1565c0; color: #fff; }
+
+    /* Mac 弹窗 */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; }
+    .dialog {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      z-index: 101;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .dialog h3 { font-size: 20px; margin-bottom: 20px; text-align: center; }
+    .dialog .dialog-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .dialog .dialog-btns a {
+      padding: 10px 24px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: opacity 0.3s;
+    }
+    .dialog .btn-apple { background: linear-gradient(135deg, #1e88e5, #1565c0); color: #fff; }
+    .dialog .btn-intel { background: #f0f0f0; color: #333; border: 1px solid #ddd; }
+    .dialog .btn-apple:hover, .dialog .btn-intel:hover { opacity: 0.8; }
+    .dialog .close-btn {
+      position: absolute; top: 14px; right: 18px;
+      background: none; border: none; font-size: 22px;
+      cursor: pointer; color: #999;
+    }
+    .dialog .close-btn:hover { color: #333; }
+    .dialog .tip { margin-top: 16px; font-size: 12px; color: #999; text-align: center; }
+
+    /* Linux 弹窗 */
+    .dialog-linux .dialog-btns { margin-bottom: 12px; }
+
+    /* 页脚 */
+    .footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+    }
+    .footer a { color: rgba(255,255,255,0.8); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    /* 移动端适配 - 横向列表 */
+    @media (max-width: 768px) {
+      .hero { padding: 6px 20px 10px; }
+      .hero .logo { width: 200px; }
+      .hero p { font-size: 13px; max-width: 100%; padding: 0 10px; }
+      .section-title { margin-bottom: 16px; font-size: 13px; }
+      .cards { grid-template-columns: 1fr; gap: 10px; }
+      .card {
+        display: flex;
+        align-items: center;
+        padding: 14px 18px;
+        text-align: left;
+        flex-direction: row;
+        gap: 14px;
+      }
+      .card .icon { width: 40px; height: 40px; margin: 0; flex-shrink: 0; }
+      .card .icon svg { width: 36px; height: 36px; }
+      .card .info { flex: 1; min-width: 0; }
+      .card h3 { font-size: 16px; margin-bottom: 2px; }
+      .card .desc { font-size: 12px; margin-bottom: 0; }
+      .card .btn { padding: 8px 22px; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
+      .card .btn-secondary { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 顶部 -->
+  <div class="hero">
+    <img class="logo" src="2.png" alt="云际会议">
+    <p>随时随地，高效协作。<br>支持 Windows / Mac / Linux / Android / iOS 全平台。</p>
+  </div>
+
+  <!-- 下载区域 -->
+  <div class="download-section">
+    <div class="section-title">— 选择你的平台下载 —</div>
+    <div class="cards">
+
+      <!-- Windows -->
+      <div class="card">
+        <div class="icon">
+          <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="88" height="88" rx="16" fill="#0078D4" fill-opacity="0.1"/>
+            <path d="M18 22L42 18.5V42H18V22Z" fill="#0078D4"/>
+            <path d="M45 18L70 14V42H45V18Z" fill="#0078D4"/>
+            <path d="M18 45H42V68.5L18 65V45Z" fill="#0078D4"/>
+            <path d="M45 45H70V73L45 69V45Z" fill="#0078D4"/>
+          </svg>
+        </div>
+        <div class="info">
+          <h3>Windows</h3>
+          <div class="desc">Windows 7 及以上</div>
+        </div>
+        <a class="btn" href="#" id="win-download">立即下载</a>
+      </div>
+
+      <!-- Mac -->
+      <div class="card">
+        <div class="icon">
+          <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="88" height="88" rx="16" fill="#333" fill-opacity="0.08"/>
+            <path d="M57.3 46.2c-.1-5.2 4.2-7.8 4.4-7.9-2.4-3.5-6.1-4-7.5-4.1-3.1-.3-6.2 1.9-7.8 1.9-1.6 0-4.1-1.9-6.7-1.8-3.4.1-6.6 2-8.4 5.2-3.6 6.3-0.9 15.6 2.6 20.7 1.7 2.5 3.7 5.3 6.4 5.2 2.6-.1 3.5-1.7 6.6-1.7 3.1 0 3.9 1.7 6.6 1.6 2.8 0 4.5-2.5 6.2-5 2-2.9 2.8-5.6 2.8-5.8-.1 0-5.4-2.1-5.5-8.3z" fill="#333"/>
+            <path d="M52.2 30.7c1.4-1.7 2.4-4 2.1-6.4-2 .1-4.5 1.4-5.9 3.1-1.3 1.5-2.5 4-2.2 6.3 2.3.2 4.6-1.2 6-3z" fill="#333"/>
+          </svg>
+        </div>
+        <div class="info">
+          <h3>macOS</h3>
+          <div class="desc">macOS 10.13 及以上</div>
+        </div>
+        <a class="btn" href="javascript:;" onclick="showMacDialog()">立即下载</a>
+      </div>
+
+      <!-- Linux -->
+      <div class="card">
+        <div class="icon">
+          <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="88" height="88" rx="16" fill="#FCC624" fill-opacity="0.12"/>
+            <path d="M44 18c-8.8 0-16 7.2-16 16v10c0 4.4-2 8.5-5.5 11.2-.8.6-1 1.7-.4 2.5.4.5 1 .8 1.6.8h40.6c.6 0 1.2-.3 1.6-.8.6-.8.4-1.9-.4-2.5C62 52.5 60 48.4 60 44V34c0-8.8-7.2-16-16-16z" fill="#333"/>
+            <circle cx="38" cy="36" r="3" fill="#FCC624"/>
+            <circle cx="50" cy="36" r="3" fill="#FCC624"/>
+            <path d="M38 48c0 0 2 4 6 4s6-4 6-4" stroke="#FCC624" stroke-width="2" stroke-linecap="round"/>
+            <path d="M32 60h24c0 0-2 10-12 10s-12-10-12-10z" fill="#FCC624"/>
+          </svg>
+        </div>
+        <div class="info">
+          <h3>Linux</h3>
+          <div class="desc">Ubuntu / 麒麟 / Deepin</div>
+        </div>
+        <a class="btn" href="javascript:;" onclick="showLinuxDialog()">立即下载</a>
+      </div>
+
+      <!-- Android -->
+      <div class="card">
+        <div class="icon">
+          <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="88" height="88" rx="16" fill="#3DDC84" fill-opacity="0.12"/>
+            <path d="M33 28l-4-7a1 1 0 0 1 1.7-1l4.1 7.1A20 20 0 0 1 44 25a20 20 0 0 1 9.2 2.1L57.3 20a1 1 0 0 1 1.7 1l-4 7A16 16 0 0 1 62 42H26a16 16 0 0 1 7-14z" fill="#3DDC84"/>
+            <circle cx="36" cy="35" r="2" fill="#fff"/>
+            <circle cx="52" cy="35" r="2" fill="#fff"/>
+            <rect x="26" y="44" width="36" height="20" rx="4" fill="#3DDC84"/>
+            <rect x="20" y="46" width="5" height="14" rx="2.5" fill="#3DDC84"/>
+            <rect x="63" y="46" width="5" height="14" rx="2.5" fill="#3DDC84"/>
+            <rect x="34" y="66" width="5" height="10" rx="2.5" fill="#3DDC84"/>
+            <rect x="49" y="66" width="5" height="10" rx="2.5" fill="#3DDC84"/>
+          </svg>
+        </div>
+        <div class="info">
+          <h3>Android</h3>
+          <div class="desc">Android 6.0 及以上</div>
+        </div>
+        <a class="btn" href="#" id="android-download">立即下载</a>
+      </div>
+
+      <!-- iOS -->
+      <div class="card">
+        <div class="icon">
+          <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="88" height="88" rx="16" fill="#007AFF" fill-opacity="0.1"/>
+            <rect x="30" y="16" width="28" height="56" rx="6" stroke="#007AFF" stroke-width="2.5" fill="none"/>
+            <circle cx="44" cy="64" r="3" fill="#007AFF"/>
+            <rect x="38" y="20" width="12" height="3" rx="1.5" fill="#007AFF" fill-opacity="0.4"/>
+          </svg>
+        </div>
+        <div class="info">
+          <h3>iOS</h3>
+          <div class="desc">iOS 12.0 及以上</div>
+        </div>
+        <a class="btn" href="#" id="ios-download">前往 App Store</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mac 芯片选择弹窗 -->
+  <div class="overlay" id="overlay" onclick="closeDialogs()"></div>
+  <div class="dialog" id="macDialog">
+    <button class="close-btn" onclick="closeDialogs()">&times;</button>
+    <h3>选择 Mac 版本</h3>
+    <div class="dialog-btns">
+      <a class="btn-apple" href="#">Apple 芯片版 (M1/M2/M3)</a>
+      <a class="btn-intel" href="#">Intel 芯片版</a>
+    </div>
+    <div class="tip">不确定芯片类型？点击左上角  → 关于本机 查看</div>
+  </div>
+
+  <!-- Linux 架构选择弹窗 -->
+  <div class="dialog dialog-linux" id="linuxDialog">
+    <button class="close-btn" onclick="closeDialogs()">&times;</button>
+    <h3>选择 Linux 版本</h3>
+    <div class="dialog-btns">
+      <a class="btn-apple" href="#">x86_64 架构版</a>
+      <a class="btn-intel" href="#">ARM64 架构版</a>
+    </div>
+    <div class="tip">仅提供 .deb 格式（Ubuntu / 麒麟 / Deepin）<br>终端输入 <code>uname -m</code> 查看架构</div>
+  </div>
+
+  <!-- 页脚 -->
+  <div class="footer">
+    <p>云际商务服务股份有限公司 &copy; 2026</p>
+  </div>
+
+  <script>
+    function showMacDialog() {
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('macDialog').style.display = 'block';
+    }
+    function showLinuxDialog() {
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('linuxDialog').style.display = 'block';
+    }
+    function closeDialogs() {
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('macDialog').style.display = 'none';
+      document.getElementById('linuxDialog').style.display = 'none';
+    }
+    // ESC 关闭弹窗
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeDialogs();
+    });
+  </script>
+</body>
+</html>
